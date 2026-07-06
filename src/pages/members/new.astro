@@ -1,0 +1,10 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { MemberForm } from "@modules/members/components/MemberForm";
+---
+
+<BaseLayout title="Nuevo Miembro">
+  <main class="flex justify-center p-6">
+    <MemberForm client:load />
+  </main>
+</BaseLayout>

@@ -1,0 +1,10 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { EventList } from "@modules/events/components/EventList";
+---
+
+<BaseLayout title="Eventos">
+  <main class="p-6">
+    <EventList client:load />
+  </main>
+</BaseLayout>

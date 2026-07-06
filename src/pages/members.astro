@@ -1,0 +1,10 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { MemberList } from "@modules/members/components/MemberList";
+---
+
+<BaseLayout title="Miembros">
+  <main class="p-6">
+    <MemberList client:load />
+  </main>
+</BaseLayout>

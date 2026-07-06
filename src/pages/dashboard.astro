@@ -1,0 +1,66 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { StatsCards } from "@modules/dashboard/components/StatsCards";
+import { WeeklyChart } from "@modules/dashboard/components/WeeklyChart";
+import { RecentActivity } from "@modules/dashboard/components/RecentActivity";
+
+const response = await fetch(`${Astro.url.origin}/api/dashboard`, {
+  headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
+});
+
+let stats: any = null;
+if (response.ok) {
+  const json = await response.json();
+  stats = json.data;
+}
+---
+
+<BaseLayout title="Dashboard">
+  <main class="p-6">
+    <div class="mx-auto max-w-6xl">
+      <h1 class="mb-6 text-2xl font-bold">Dashboard</h1>
+
+      {stats ? (
+        <div class="space-y-6">
+          <StatsCards client:load data={{
+            totalMembers: stats.totalMembers,
+            activeMembers: stats.activeMembers,
+            totalEvents: stats.totalEvents,
+            todayAttendances: stats.todayAttendances,
+            attendancePercentage: stats.attendancePercentage,
+          }} />
+
+          {stats.activeEvent && (
+            <div class="rounded-md bg-primary/5 p-4">
+              <p class="text-sm text-muted-foreground">Evento activo</p>
+              <div class="flex items-baseline gap-2">
+                <p class="text-lg font-bold">{stats.activeEvent.name}</p>
+                <p class="text-sm text-muted-foreground">
+                  — {stats.activeEvent.attendanceCount} asistencias
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <WeeklyChart
+              client:load
+              currentWeek={stats.weeklyComparison.currentWeek}
+              previousWeek={stats.weeklyComparison.previousWeek}
+            />
+            <RecentActivity client:load data={stats.recentAttendances} />
+          </div>
+        </div>
+      ) : (
+        <div class="rounded-md bg-yellow-50 p-8 text-center">
+          <p class="text-lg font-medium text-yellow-800">
+            No se pudieron cargar las estadísticas
+          </p>
+          <p class="mt-2 text-sm text-yellow-600">
+            Inicia sesión para ver el dashboard.
+          </p>
+        </div>
+      )}
+    </div>
+  </main>
+</BaseLayout>

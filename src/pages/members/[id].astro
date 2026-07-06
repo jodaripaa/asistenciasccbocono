@@ -1,0 +1,40 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { MemberForm } from "@modules/members/components/MemberForm";
+
+const memberId = Astro.params.id!;
+
+const response = await fetch(`${Astro.url.origin}/api/members/${memberId}`, {
+  headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
+});
+
+let defaultValues = {};
+if (response.ok) {
+  const { data } = await response.json();
+  defaultValues = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    documentId: data.documentId ?? "",
+    email: data.email ?? "",
+    phone: data.phone ?? "",
+    photoUrl: data.photoUrl ?? "",
+    role: data.role,
+  };
+}
+---
+
+<BaseLayout title="Editar Miembro">
+  <main class="p-6">
+    <div class="mb-4 flex justify-center">
+      <a
+        href={`/members/${memberId}/credential`}
+        class="inline-flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
+      >
+        Ver Credencial QR
+      </a>
+    </div>
+    <div class="flex justify-center">
+      <MemberForm client:load memberId={memberId} defaultValues={defaultValues} />
+    </div>
+  </main>
+</BaseLayout>

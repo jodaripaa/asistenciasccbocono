@@ -1,0 +1,28 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { EventForm } from "@modules/events/components/EventForm";
+
+const eventId = Astro.params.id!;
+
+const response = await fetch(`${Astro.url.origin}/api/events/${eventId}`, {
+  headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
+});
+
+let defaultValues = {};
+if (response.ok) {
+  const { data } = await response.json();
+  defaultValues = {
+    name: data.name,
+    description: data.description ?? "",
+    date: data.date ? new Date(data.date).toISOString().slice(0, 16) : "",
+    type: data.type,
+    isActive: data.isActive,
+  };
+}
+---
+
+<BaseLayout title="Editar Evento">
+  <main class="flex justify-center p-6">
+    <EventForm client:load eventId={eventId} defaultValues={defaultValues} />
+  </main>
+</BaseLayout>

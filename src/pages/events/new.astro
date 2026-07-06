@@ -1,0 +1,10 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { EventForm } from "@modules/events/components/EventForm";
+---
+
+<BaseLayout title="Nuevo Evento">
+  <main class="flex justify-center p-6">
+    <EventForm client:load />
+  </main>
+</BaseLayout>

@@ -1,0 +1,49 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { Scanner } from "@modules/attendance/components/Scanner";
+import { AttendanceList } from "@modules/attendance/components/AttendanceList";
+
+const activeRes = await fetch(`${Astro.url.origin}/api/events/active`, {
+  headers: { cookie: Astro.request.headers.get("cookie") ?? "" },
+});
+
+let activeEvent: { id: string; name: string } | null = null;
+let activeEventJson: any = null;
+
+if (activeRes.ok) {
+  activeEventJson = await activeRes.json();
+  if (activeEventJson.data) {
+    activeEvent = { id: activeEventJson.data.id, name: activeEventJson.data.name };
+  }
+}
+---
+
+<BaseLayout title="Registro de Asistencia">
+  <main class="p-6">
+    <div class="mx-auto max-w-4xl">
+      <h1 class="mb-6 text-2xl font-bold">Registro de Asistencia</h1>
+
+      {activeEvent ? (
+        <>
+          <div class="mb-4 rounded-md bg-primary/5 p-4 text-center">
+            <p class="text-sm text-muted-foreground">Evento activo</p>
+            <p class="text-lg font-bold">{activeEvent.name}</p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Scanner client:load eventId={activeEvent.id} />
+            <AttendanceList client:load eventId={activeEvent.id} />
+          </div>
+        </>
+      ) : (
+        <div class="rounded-md bg-yellow-50 p-8 text-center">
+          <p class="text-lg font-medium text-yellow-800">No hay un evento activo</p>
+          <p class="mt-2 text-sm text-yellow-600">
+            Crea un evento y actívalo desde la sección{" "}
+            <a href="/events" class="underline">Eventos</a> para comenzar a registrar asistencia.
+          </p>
+        </div>
+      )}
+    </div>
+  </main>
+</BaseLayout>

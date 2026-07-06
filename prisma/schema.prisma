@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  REGISTRAR
+}
+
+enum MemberRole {
+  LEADER
+  STUDENT
+}
+
+enum EventType {
+  SERVICE
+  BIBLE_SCHOOL
+  CONGRESS
+  VIGIL
+  CAMP
+  SPECIAL
+  CELL
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(REGISTRAR)
+  isActive  Boolean  @default(true)
+
+  membersCreated   Member[]     @relation("MemberCreatedBy")
+  eventsCreated    Event[]      @relation("EventCreatedBy")
+  registrations    Attendance[] @relation("AttendanceRegisteredBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Member {
+  id         String     @id @default(uuid())
+  qrToken    String     @unique @default(uuid())
+  firstName  String
+  lastName   String
+  documentId String?    @unique
+  email      String?
+  phone      String?
+  photoUrl   String?
+  role       MemberRole
+  isActive   Boolean    @default(true)
+
+  createdBy   User         @relation("MemberCreatedBy", fields: [createdById], references: [id])
+  createdById String
+  attendances Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([firstName, lastName])
+  @@index([documentId])
+  @@index([isActive])
+  @@map("members")
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  date        DateTime
+  type        EventType
+  isActive    Boolean   @default(true)
+
+  createdBy   User         @relation("EventCreatedBy", fields: [createdById], references: [id])
+  createdById String
+  attendances Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([date])
+  @@index([type])
+  @@index([isActive])
+  @@map("events")
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  scannedAt DateTime         @default(now())
+  status    AttendanceStatus @default(PRESENT)
+
+  memberId       String
+  member         Member @relation(fields: [memberId], references: [id])
+  eventId        String
+  event          Event  @relation(fields: [eventId], references: [id])
+  registeredById String
+  registeredBy   User   @relation("AttendanceRegisteredBy", fields: [registeredById], references: [id])
+
+  @@unique([memberId, eventId])
+  @@index([eventId])
+  @@index([memberId])
+  @@index([scannedAt])
+  @@map("attendances")
+}

@@ -1,0 +1,9 @@
+[build]
+  builder = "nixpacks"
+  buildCommand = "npm run db:generate && npm run build"
+  startCommand = "node dist/server/entry.mjs"
+
+[deploy]
+  numReplicas = 1
+  healthcheckPath = "/"
+  restartPolicyType = "always"

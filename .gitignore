@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+public/uploads/*
+!public/uploads/.gitkeep
+prisma/*.db
