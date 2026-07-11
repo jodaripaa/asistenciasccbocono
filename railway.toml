@@ -5,5 +5,5 @@
 
 [deploy]
   numReplicas = 1
-  healthcheckPath = "/"
+  healthcheckPath = "/health"
   restartPolicyType = "always"

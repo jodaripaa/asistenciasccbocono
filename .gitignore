@@ -9,3 +9,4 @@ Thumbs.db
 public/uploads/*
 !public/uploads/.gitkeep
 prisma/*.db
+prisma/test-connection.mjs
